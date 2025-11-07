@@ -281,7 +281,8 @@ def mostrar_moduloA():
                 )
                 
                 plazo_años = edad_jubilacion - edad_actual
-                
+                rentabilidad = (interes_total / total_aportado) * 100 if total_aportado > 0 else 0
+
                 # ============ MOSTRAR RESULTADOS ============
                 st.divider()
                 st.markdown("### 📊 Resultados de la Simulación")
@@ -299,46 +300,75 @@ def mostrar_moduloA():
                 rentabilidad = (interes_total / total_aportado) * 100 if total_aportado > 0 else 0
                 st.info(f"📈 **Rentabilidad total:** {rentabilidad:.2f}% en {plazo_años} años")
                 
-                # ============ GRÁFICA ============
-                st.markdown("### 📉 Gráfica de Crecimiento")
-                fig = graficar_crecimiento(df_resultados)
-                st.pyplot(fig)
-                
-                # ============ TABLA DETALLADA ============
-                st.markdown("### 📋 Tabla Detallada de Crecimiento")
-                
-                # Mostrar opciones de visualización
-                opcion_tabla = st.radio(
-                    "Selecciona qué mostrar:",
-                    ["Primeros 10 periodos", "Últimos 10 periodos", "Tabla completa"],
-                    horizontal=True
-                )
-                
-                if opcion_tabla == "Primeros 10 periodos":
-                    st.dataframe(df_resultados.head(10), use_container_width=True)
-                elif opcion_tabla == "Últimos 10 periodos":
-                    st.dataframe(df_resultados.tail(10), use_container_width=True)
-                else:
-                    st.dataframe(df_resultados, use_container_width=True, height=400)
-                
                 # ============ GUARDAR EN SESSION STATE ============
                 st.session_state['saldo_bruto'] = saldo_final
                 st.session_state['aportes_totales'] = total_aportado
+                st.session_state['df_resultados'] = df_resultados
+                st.session_state['rentabilidad'] = rentabilidad
+                st.session_state['plazo_años'] = plazo_años
+                st.session_state['interes_total'] = interes_total
+                st.session_state['saldo_final'] = saldo_final
+                st.session_state['total_aportado'] = total_aportado
 
                 # 👇 LÍNEAS NUEVAS PARA GUARDAR LAS EDADES 👇
                 st.session_state['edad_actual'] = edad_actual
                 st.session_state['edad_jubilacion'] = edad_jubilacion
                 # 👆 FIN DE LÍNEAS NUEVAS 👆
-
                 
                 st.success("✅ Cálculo completado. Los valores se han guardado para usar en el Módulo B (Jubilación).")
-                
-                # Retornar valores para integración
-                return saldo_final, total_aportado
         
         except Exception as e:
             st.error(f"❌ Error en el cálculo: {str(e)}")
-            return None, None
+
+    # ============ MOSTRAR RESULTADOS SI EXISTEN EN SESSION STATE ============
+    if 'df_resultados' in st.session_state:
+        df_resultados = st.session_state['df_resultados']
+        saldo_final = st.session_state['saldo_final']
+        total_aportado = st.session_state['total_aportado']
+        interes_total = st.session_state['interes_total']
+        rentabilidad = st.session_state['rentabilidad']
+        plazo_años = st.session_state['plazo_años']
+        
+        # ============ MOSTRAR RESULTADOS ============
+        st.divider()
+        st.markdown("### 📊 Resultados de la Simulación")
+        
+        # Métricas principales
+        col_m1, col_m2, col_m3 = st.columns(3)
+        with col_m1:
+            st.metric("Total Aportado", f"${total_aportado:,.2f} USD")
+        with col_m2:
+            st.metric("Intereses Ganados", f"${interes_total:,.2f} USD")
+        with col_m3:
+            st.metric("💰 Saldo Final", f"${saldo_final:,.2f} USD")
+        
+        # Rentabilidad
+        st.info(f"📈 **Rentabilidad total:** {rentabilidad:.2f}% en {plazo_años} años")
+        
+        # ============ GRÁFICA ============
+        st.markdown("### 📉 Gráfica de Crecimiento")
+        fig = graficar_crecimiento(df_resultados)
+        st.pyplot(fig)
+        
+        # ============ TABLA DETALLADA ============
+        st.markdown("### 📋 Tabla Detallada de Crecimiento")
+        
+        # Mostrar opciones de visualización
+        opcion_tabla = st.radio(
+            "Selecciona qué mostrar:",
+            ["Primeros 10 periodos", "Últimos 10 periodos", "Tabla completa"],
+            horizontal=True
+        )
+        
+        if opcion_tabla == "Primeros 10 periodos":
+            st.dataframe(df_resultados.head(10), use_container_width=True)
+        elif opcion_tabla == "Últimos 10 periodos":
+            st.dataframe(df_resultados.tail(10), use_container_width=True)
+        else:
+            st.dataframe(df_resultados, use_container_width=True, height=400)
+        
+        # Retornar valores para integración
+        return saldo_final, total_aportado  
     
     # Si aún no se ha calculado, retornar None
     return None, None
