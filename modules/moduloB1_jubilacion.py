@@ -63,4 +63,10 @@ def mostrar_moduloB1():
     st.session_state["saldo_neto"] = saldo_neto
     st.session_state["anos_inversion"] = anos_inversion  # Por si acaso
 
+    # Guardar parámetros/entradas relevantes para el reporte
+    st.session_state["tipo_inversion"] = tipo_inversion
+    st.session_state["tasa_impuesto"] = float(tasa_impuesto)
+    st.session_state["monto_impuesto"] = float(monto_impuesto)
+    st.session_state["ganancia"] = float(ganancia)
+
     return saldo_neto

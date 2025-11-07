@@ -1,5 +1,8 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
+import math
+import matplotlib.pyplot as plt
 
 
 def mostrar_moduloC():
@@ -71,8 +74,18 @@ def mostrar_moduloC():
                 flujo = cupon
                 if i == n_periodos:
                     flujo += valor_nominal
+                # Asegurar que los valores sean finitos
+                flujo = float(flujo)
+                if not math.isfinite(flujo):
+                    flujo = 0.0
                 flujos.append(flujo)
-                valor_presente = flujo / ((1 + tasa_periodica) ** i)
+                # calcular valor presente y garantizar finito
+                try:
+                    valor_presente = float(flujo) / ((1 + float(tasa_periodica)) ** i)
+                except Exception:
+                    valor_presente = 0.0
+                if not math.isfinite(valor_presente):
+                    valor_presente = 0.0
                 valores_descontados.append(valor_presente)
     
             df = pd.DataFrame({
@@ -80,16 +93,42 @@ def mostrar_moduloC():
                 "Flujo": flujos,
                 "Valor descontado": valores_descontados
             })
+
+            # Limpiar posibles infinitos/NaN antes de almacenar y mostrar
+            df = df.replace([np.inf, -np.inf], np.nan)
+            df["Flujo"] = pd.to_numeric(df["Flujo"], errors='coerce').fillna(0.0)
+            df["Valor descontado"] = pd.to_numeric(df["Valor descontado"], errors='coerce').fillna(0.0)
     
             valor_presente_total = sum(valores_descontados)
+
+            # Guardar resultados en session_state para que el app principal pueda usarlos
+            st.session_state['bono_vp'] = float(valor_presente_total)
+            st.session_state['bono_params'] = {
+                'valor_nominal': float(valor_nominal),
+                'tasa_cupon': float(tasa_cupon),
+                'frecuencia': frecuencia_nombre,
+                'tasa_tea': float(tasa_tea),
+                'anios': int(anios)
+            }
+            st.session_state['bono_df'] = df
+
     
             st.subheader("📊 Tabla de flujos descontados")
             st.dataframe(df.style.format({"Flujo": "{:,.2f}", "Valor descontado": "{:,.2f}"}))
-    
+
             st.markdown(f"### 💵 Valor Presente Total (PV): **${valor_presente_total:,.2f}**")
-    
+
             st.subheader("📈 Valor presente de cada flujo")
-            st.bar_chart(df.set_index("Periodo")["Valor descontado"])
+            # Usar serie limpia para gráfico (evitar inf/nan que generan advertencias en Vega)
+            serie_vp = df.set_index("Periodo")["Valor descontado"].astype(float).replace([np.inf, -np.inf], np.nan).fillna(0.0)
+            # Dibujar con matplotlib (evitar Vega/Altair para prevenir advertencias en consola)
+            fig, ax = plt.subplots(figsize=(6, 3))
+            ax.bar(serie_vp.index.astype(str), serie_vp.values, color='#2b8cbe')
+            ax.set_xlabel('Periodo')
+            ax.set_ylabel('Valor descontado')
+            ax.set_title('Valor presente de cada flujo')
+            plt.tight_layout()
+            st.pyplot(fig)
 
 
 if __name__ == "__main__":

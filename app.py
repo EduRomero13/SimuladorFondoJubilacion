@@ -21,6 +21,7 @@ from modules.moduloA_cartera import mostrar_moduloA
 from modules.moduloB1_jubilacion import mostrar_moduloB1
 from modules.moduloC_bonos import mostrar_moduloC
 from modules.moduloB2_pension import mostrar_moduloB2
+from reporte import mostrar_reporte
 
 
 # Navegación del sidebar se implementa con HTML/JS para hacer scroll sin recarga
@@ -31,15 +32,33 @@ def main():
     with st.sidebar:
         st.title("Navegación")
         st.write("Selecciona el módulo a mostrar:")
+        st.markdown("<a href='#modIntro'>• Introducción</a>", unsafe_allow_html=True)
         st.markdown("<a href='#modA'>• Módulo A - Cartera</a>", unsafe_allow_html=True)
         st.markdown("<a href='#modB1'>• Módulo B1 - Jubilación</a>", unsafe_allow_html=True)
         st.markdown("<a href='#modB2'>• Módulo B2 - Pensión</a>", unsafe_allow_html=True)
         st.markdown("<a href='#modC'>• Módulo C - Bonos</a>", unsafe_allow_html=True)
+        st.markdown("<a href='#modExport'>• Generar reporte (PDF)</a>", unsafe_allow_html=True)
         st.markdown("---")
-        st.markdown("Hecho para integrar y visualizar todos los módulos en una sola página.")
+        st.markdown("Navega entre módulos rápidamente haciendo click en estas opciones.")
 
     # Área principal: renderizamos TODOS los módulos en orden, con anclas HTML
     st.header("Simulador de Fondo de Jubilación")
+
+    # Introducción/Resumen arriba de Módulo A
+    st.markdown('<div id="modIntro"></div>', unsafe_allow_html=True)
+    st.markdown("## 📘 Introducción al Simulador", unsafe_allow_html=True)
+    st.markdown(
+        (
+            "Este simulador muestra tres módulos principales: **Crecimiento de Cartera (A)**, "
+            "**Impuestos y Saldo Neto (B1)**, **Proyección de Pensión (B2)** y **Bonos (C)**. "
+            "Usa los controles del sidebar para saltar a cada sección. Cada módulo mantiene "
+            "su propia interfaz: calcula proyecciones, aplica impuestos y permite analizar "
+            "escenarios financieros.\n\n"
+            "Puedes ejecutar el cálculo en el Módulo A para obtener resultados que se usan "
+            "en los módulos B1 y B2, pero también puedes introducir valores manualmente si lo prefieres."
+        )
+    )
+    st.markdown("---")
 
     # Ancla y Módulo A
     st.markdown('<div id="modA"></div>', unsafe_allow_html=True)
@@ -66,6 +85,11 @@ def main():
     st.markdown('<div id="modC"></div>', unsafe_allow_html=True)
     st.markdown("## Módulo C – Bonos")
     mostrar_moduloC()
+
+    st.markdown("---")
+
+    # Usar el módulo separado para renderizar la sección de reporte
+    mostrar_reporte()
 
     # No usamos query params; el comportamiento de scroll se logra con enlaces hash
 

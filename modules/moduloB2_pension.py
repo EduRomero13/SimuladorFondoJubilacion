@@ -21,6 +21,20 @@ def mostrar_moduloB2():
 
     st.info(f"Saldo neto disponible al jubilarse: **USD ${saldo_neto:,.2f}**")
 
+    # 🟢 Nuevo: Tipo de inversión para calcular impuestos finales
+    tipo_inversion = st.selectbox(
+        "Tipo de inversión durante la jubilación:",
+        options=["BVL - Bolsa local (5%)", "BEX - Fuente extranjera (29.5%)", "Sin impuesto"],
+        help="Selecciona el origen de las ganancias para aplicar el impuesto correspondiente sobre la rentabilidad."
+    )
+
+    if "BVL" in tipo_inversion:
+        tasa_impuesto = 0.05
+    elif "BEX" in tipo_inversion:
+        tasa_impuesto = 0.295
+    else:
+        tasa_impuesto = 0.0
+
     # 2️⃣ Parámetros principales del retiro
     st.markdown("### 📆 Parámetros del retiro")
 
@@ -54,10 +68,12 @@ def mostrar_moduloB2():
 
     total_recibido = pension_mensual * n_meses
     ganancia_total = total_recibido - saldo_neto
+    impuesto_final = ganancia_total * tasa_impuesto
+    total_neto = total_recibido - impuesto_final
 
     st.success(f"💵 Pensión mensual estimada: **${pension_mensual:,.2f} USD**")
-    st.write(f"Total estimado recibido en {años_retiro} años: **${total_recibido:,.2f} USD**")
-    st.caption(f"(Incluye una ganancia estimada de ${ganancia_total:,.2f})")
+    st.write(f"Total estimado recibido en {años_retiro} años (neto): **${total_neto:,.2f} USD**")
+    st.caption(f"(Impuesto aplicado sobre ganancia: ${impuesto_final:,.2f})")
 
     # 4️⃣ Comparar escenarios
     st.divider()
@@ -97,6 +113,14 @@ def mostrar_moduloB2():
         else:
             pension_2 = saldo_esc2 * (tasa_mensual_2 / (1 - (1 + tasa_mensual_2) ** -n_meses_2))
 
+        # Aplicar impuesto sobre ganancia
+        total_1 = pension_1 * n_meses_1
+        total_2 = pension_2 * n_meses_2
+        impuesto_1 = max(0, (total_1 - saldo_esc1) * tasa_impuesto)
+        impuesto_2 = max(0, (total_2 - saldo_esc2) * tasa_impuesto)
+        total_1_neto = total_1 - impuesto_1
+        total_2_neto = total_2 - impuesto_2
+
         # Mostrar resultados
         st.markdown("#### 📊 Resultados comparativos")
 
@@ -105,12 +129,12 @@ def mostrar_moduloB2():
             st.info(f"**Escenario 1 ({edad_1} años)**")
             st.write(f"- Saldo acumulado: **${saldo_esc1:,.2f}**")
             st.write(f"- Pensión mensual: **${pension_1:,.2f}**")
-            st.write(f"- Duración del retiro: {años_retiro_1} años")
+            st.write(f"- Total neto: **${total_1_neto:,.2f}**")
         with colB:
             st.success(f"**Escenario 2 ({edad_2} años)**")
             st.write(f"- Saldo acumulado: **${saldo_esc2:,.2f}**")
             st.write(f"- Pensión mensual: **${pension_2:,.2f}**")
-            st.write(f"- Duración del retiro: {años_retiro_2} años")
+            st.write(f"- Total neto: **${total_2_neto:,.2f}**")
 
         diferencia_pension = pension_2 - pension_1
         diferencia_saldo = saldo_esc2 - saldo_esc1
@@ -122,6 +146,13 @@ def mostrar_moduloB2():
 
     # 5️⃣ Guardar resultados en session_state
     st.session_state["pension_mensual"] = pension_mensual
-    st.session_state["total_recibido"] = total_recibido
+    st.session_state["total_recibido"] = total_neto
+
+    # Guardar parámetros de entrada y resultados intermedios para el reporte
+    st.session_state["tasa_retorno"] = float(tasa_retorno)
+    st.session_state["años_retiro"] = int(años_retiro)
+    st.session_state["tasa_impuesto_retiro"] = float(tasa_impuesto)
+    st.session_state["impuesto_final"] = float(impuesto_final)
+    st.session_state["total_neto"] = float(total_neto)
 
     return pension_mensual
