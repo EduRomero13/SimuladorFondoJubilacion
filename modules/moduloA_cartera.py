@@ -40,6 +40,7 @@ def calcular_tasa_periodo(tea, frecuencia):
 def simular_crecimiento_cartera(monto_inicial, aporte_periodico, frecuencia, tea, edad_actual, edad_jubilacion):
     """
     Simula el crecimiento de una cartera con interés compuesto.
+    Ahora los aportes se consideran al FINAL del periodo.
     
     Parámetros:
     -----------
@@ -98,25 +99,21 @@ def simular_crecimiento_cartera(monto_inicial, aporte_periodico, frecuencia, tea
         saldos_iniciales.append(saldo)
         
         if periodo == 0:
-            # En el periodo 0 solo tenemos el monto inicial
-            aportes.append(monto_inicial)
+            # En el periodo 0 solo tenemos el monto inicial, no hay aporte ni intereses aún
+            aportes.append(0.0)  # 👈 NO hay aporte en el periodo 0
             intereses.append(0.0)
-            saldos_finales.append(monto_inicial)
+            saldos_finales.append(saldo)
         else:
-            # Agregar aporte periódico
-            saldo_con_aporte = saldo + aporte_periodico
+            # Calcular interés sobre el saldo INICIAL del periodo
+            interes_periodo = saldo * tasa_periodo
+            # Nuevo saldo al final del periodo: saldo + interes + aporte
+            saldo = saldo + interes_periodo + aporte_periodico  # 👈 Aporte se suma DESPUÉS del interés
             
-            # Calcular interés sobre el saldo (incluye el aporte)
-            interes_periodo = saldo_con_aporte * tasa_periodo
-            
-            # Nuevo saldo al final del periodo
-            saldo = saldo_con_aporte + interes_periodo
-            
-            # Registrar valores
+            # Registrar valores para este periodo
             aportes.append(aporte_periodico)
             intereses.append(interes_periodo)
             saldos_finales.append(saldo)
-    
+
     # Crear DataFrame con resultados
     df_resultados = pd.DataFrame({
         'Periodo': periodos,
@@ -131,7 +128,7 @@ def simular_crecimiento_cartera(monto_inicial, aporte_periodico, frecuencia, tea
     
     # Calcular métricas finales
     saldo_final = saldos_finales[-1]
-    total_aportado = monto_inicial + (aporte_periodico * total_periodos)
+    total_aportado = monto_inicial + (aporte_periodico * total_periodos)  # Incluye el monto inicial
     interes_total_ganado = saldo_final - total_aportado
     
     return df_resultados, saldo_final, total_aportado, interes_total_ganado
