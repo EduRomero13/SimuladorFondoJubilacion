@@ -148,4 +148,11 @@ def mostrar_moduloB2():
     st.session_state["pension_mensual"] = pension_mensual
     st.session_state["total_recibido"] = total_neto
 
+    # Guardar parámetros de entrada y resultados intermedios para el reporte
+    st.session_state["tasa_retorno"] = float(tasa_retorno)
+    st.session_state["años_retiro"] = int(años_retiro)
+    st.session_state["tasa_impuesto_retiro"] = float(tasa_impuesto)
+    st.session_state["impuesto_final"] = float(impuesto_final)
+    st.session_state["total_neto"] = float(total_neto)
+
     return pension_mensual

@@ -310,10 +310,13 @@ def mostrar_moduloA():
                 st.session_state['saldo_final'] = saldo_final
                 st.session_state['total_aportado'] = total_aportado
 
-                # 👇 LÍNEAS NUEVAS PARA GUARDAR LAS EDADES 👇
-                st.session_state['edad_actual'] = edad_actual
-                st.session_state['edad_jubilacion'] = edad_jubilacion
-                # 👆 FIN DE LÍNEAS NUEVAS 👆
+                # Guardar inputs y edades en session_state para el reporte
+                st.session_state['monto_inicial'] = float(monto_inicial)
+                st.session_state['aporte_periodico'] = float(aporte_periodico)
+                st.session_state['frecuencia_aporte'] = frecuencia
+                st.session_state['tea'] = float(tea)
+                st.session_state['edad_actual'] = int(edad_actual)
+                st.session_state['edad_jubilacion'] = int(edad_jubilacion)
                 
                 st.success("✅ Cálculo completado. Los valores se han guardado para usar en el Módulo B (Jubilación).")
         
