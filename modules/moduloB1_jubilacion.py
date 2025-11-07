@@ -16,7 +16,7 @@ def mostrar_moduloB1():
 
     if saldo_bruto is None or aportes_totales is None:
         st.warning("⚠️ No se encontraron resultados del Módulo A. Por favor, completa primero el **Crecimiento de Cartera**.")
-        st.stop()
+        return None 
 
     # 2. Mostrar las edades (ya no pedirlas, solo mostrarlas)
     st.markdown("### 📅 Edad del usuario")
@@ -29,7 +29,7 @@ def mostrar_moduloB1():
     # 3. Validar que edad_jubilacion > edad_actual
     if edad_jubilacion <= edad_actual:
         st.error("❌ La edad de jubilación debe ser mayor que la edad actual.")
-        st.stop()
+        return None
 
     # 4. Entrada del tipo de inversión
     tipo_inversion = st.selectbox(
