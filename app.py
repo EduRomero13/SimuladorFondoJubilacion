@@ -21,6 +21,7 @@ from modules.moduloA_cartera import mostrar_moduloA
 from modules.moduloB1_jubilacion import mostrar_moduloB1
 from modules.moduloC_bonos import mostrar_moduloC
 from modules.moduloB2_pension import mostrar_moduloB2
+from reporte import mostrar_reporte
 
 
 # Navegación del sidebar se implementa con HTML/JS para hacer scroll sin recarga
@@ -36,6 +37,7 @@ def main():
         st.markdown("<a href='#modB1'>• Módulo B1 - Jubilación</a>", unsafe_allow_html=True)
         st.markdown("<a href='#modB2'>• Módulo B2 - Pensión</a>", unsafe_allow_html=True)
         st.markdown("<a href='#modC'>• Módulo C - Bonos</a>", unsafe_allow_html=True)
+        st.markdown("<a href='#modExport'>• Generar reporte (PDF)</a>", unsafe_allow_html=True)
         st.markdown("---")
         st.markdown("Navega entre módulos rápidamente haciendo click en estas opciones.")
 
@@ -83,6 +85,11 @@ def main():
     st.markdown('<div id="modC"></div>', unsafe_allow_html=True)
     st.markdown("## Módulo C – Bonos")
     mostrar_moduloC()
+
+    st.markdown("---")
+
+    # Usar el módulo separado para renderizar la sección de reporte
+    mostrar_reporte()
 
     # No usamos query params; el comportamiento de scroll se logra con enlaces hash
 
