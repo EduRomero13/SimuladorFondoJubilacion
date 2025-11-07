@@ -328,23 +328,7 @@ def mostrar_moduloA():
         interes_total = st.session_state['interes_total']
         rentabilidad = st.session_state['rentabilidad']
         plazo_años = st.session_state['plazo_años']
-        
-        # ============ MOSTRAR RESULTADOS ============
-        st.divider()
-        st.markdown("### 📊 Resultados de la Simulación")
-        
-        # Métricas principales
-        col_m1, col_m2, col_m3 = st.columns(3)
-        with col_m1:
-            st.metric("Total Aportado", f"${total_aportado:,.2f} USD")
-        with col_m2:
-            st.metric("Intereses Ganados", f"${interes_total:,.2f} USD")
-        with col_m3:
-            st.metric("💰 Saldo Final", f"${saldo_final:,.2f} USD")
-        
-        # Rentabilidad
-        st.info(f"📈 **Rentabilidad total:** {rentabilidad:.2f}% en {plazo_años} años")
-        
+    
         # ============ GRÁFICA ============
         st.markdown("### 📉 Gráfica de Crecimiento")
         fig = graficar_crecimiento(df_resultados)
